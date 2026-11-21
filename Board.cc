@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include "Piece.h"
 #include "Position.h"
 #include "King.h"
@@ -250,4 +251,92 @@ bool Board::isValidBoard() const
     }
 
     return (blackKings == 1 && whiteKings == 1);
+}
+
+Position Board::getEnPassantTarget() const
+{
+    return EnPassantTarget;
+}
+
+//sets up board with default pieces and positions
+/*
+8 rnbqkbnr
+7 pppppppp
+6  _ _ _ _
+5 _ _ _ _
+4  _ _ _ _
+3 _ _ _ _
+2 PPPPPPPP
+1 RNBQKBNR 
+  abcdefgh */
+void Board::defaultSetup()
+{
+    clear();
+    const char whiteBackRank[] = "RNBQKBNR"; //iterate through these in loop, pass the char at j to setSquare
+    const char blackBackRank[] = "rnbqkbnr";
+    for(int j = 0; j < 8; j++)
+    {
+        setSquare(whiteBackRank[j], Position{j, 0});
+        setSquare('P', Position{j, 1});
+        setSquare('p', Position{j, 6});
+        setSquare(blackBackRank[j], Position{j, 7});
+    }
+}
+
+std::ostream &operator<<(std::ostream &out, const Board &b)
+{
+    for (int i = 7; i >= 0; i--)
+    {
+        out << i + 1 << " ";
+        for(int j = 0; j < 8; j++)
+        {
+            if (b.getSquare(Position{j,i}) == nullptr)
+            {
+                if((i + j) % 2 == 0)
+                {
+                    out << '_';
+                }
+                else
+                {
+                    out << ' ';
+                }
+            }
+            else
+            {
+                out << b.getSquare(Position{j,i})->getSymbol();
+            }
+        }
+        out << '\n';
+    }
+    out << "\n  abcdefgh\n";
+
+    return out;
+}
+
+void Board::printBoard() const
+{
+    cout << *this;
+}
+
+void Board::movePiece(Position from, Position to)
+{
+
+    if(!(from.validPos() && to.validPos()) || from == to) //valid position check
+    {
+        return;
+    }
+
+    Piece *p = getSquare(from);
+
+    if(p == nullptr)
+    {
+        return;
+    }
+
+    EnPassantTarget = Position{-1,-1};
+
+    delete squares[to.y][to.x];
+    squares[to.y][to.x] = p;
+    squares[from.y][from.x] = nullptr;
+    p->setPos(to);
 }
