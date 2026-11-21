@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Player.h"
 #include "Board.h"
+#include "Piece.h"
 #include "Score.h"
 #include "Position.h"
 #include <string>
@@ -37,29 +38,29 @@ bool Game::newGame(string white, string black)
     }
     //set up white player yeah i know i could do this better but it works for now
     if (white == "human") {
-        whitePlayer = new Human{"white", true};//im assuming players are: string colour, bool isTurn, int level if ai
+        whitePlayer = new Human{"white"};//im assuming players are: string colour, int level if ai
     } else if (white == "computer1") {
-        whitePlayer = new Computer{"white", true, 1};
+        whitePlayer = new Computer{"white", 1};
     } else if (white == "computer2") {
-        whitePlayer = new Computer{"white", true, 2};
+        whitePlayer = new Computer{"white", 2};
     } else if (white == "computer3") {
-        whitePlayer = new Computer{"white", true, 3};
+        whitePlayer = new Computer{"white", 3};
     } else if (white == "computer4") {
-        whitePlayer = new Computer{"white", true, 4};
+        whitePlayer = new Computer{"white", 4};
     } else {
         return false;
     }
     //set up black
     if (black == "human") {
-        blackPlayer = new Human{"black", false};
+        blackPlayer = new Human{"black"};
     } else if (black == "computer1") {
-        blackPlayer = new Computer{"black", false, 1};
+        blackPlayer = new Computer{"black", 1};
     } else if (black == "computer2") {
-        blackPlayer = new Computer{"black", false, 2};
+        blackPlayer = new Computer{"black", 2};
     } else if (black == "computer3") {
-        blackPlayer = new Computer{"black", false, 3};
+        blackPlayer = new Computer{"black", 3};
     } else if (black == "computer4") {
-        blackPlayer = new Computer{"black", false, 4};
+        blackPlayer = new Computer{"black", 4};
     } else {
         delete whitePlayer; // new game failed cant leave it here
         whitePlayer = nullptr;
@@ -88,8 +89,21 @@ void Game::setup()
     board->clear();
 }
 
-bool Game::move(string startPos, string endPos)
+bool Game::move(string startPos, string endPos, string promotion)
 {
+    string valid = "NRBQnrbqk";
+    Position ep, sp;
+    if (startPos.length() != 2 || endPos.length() != 2) {return false; }//check valid position command
+    ep.x = endPos[0] - 'a';
+    ep.y = endPos[1] - '1';
+    sp.x = startPos[0] - 'a';
+    sp.y = startPos[1] - '1';
+    if (valid.find(promotion) == string::npos && promotion != " ") {return false;}//check valid promotion command 
+    if (!ep.validPos() || !sp.validPos()) {return false; }//check valid positions
+    Piece* piece = board->getSquare(sp);
+    if (piece == nullptr) {return false; }
+    if ((piece->getSymbol(sp) != "p" && piece->getSymbol(sp) != "P") && promotion != " ")
+    { return false; } //check if promoting somethign that is not a pawn
 
 }
 
@@ -134,7 +148,15 @@ bool Game::setupRemoveSquare(string pos)
 }
 bool Game::setupTurn(string colour)
 {
-    //idk yet
+    if (colour == "white") {
+        whitesTurn = true;
+        return true;
+    } else if (colour == "black") {
+        whitesTurn = false;
+        return true;
+    } else{
+        return false;
+    }
 }
 bool Game::done()
 {

@@ -12,6 +12,7 @@ class Game
     Player *blackPlayer = nullptr;
     Board *board;
     Score *score;
+    bool whitesTurn = true;
     bool running = false;
     bool isSetup = false;
     public:
@@ -21,7 +22,7 @@ class Game
         bool newGame(string white, string black);
         Board &getBoard();
         void setup();
-        bool move(string startPos, string endPos);
+        bool move(string startPos, string endPos, string promotion);
         void resign();
         //annoying functions to acces methods in Board because communication only has acces to game
         bool setupSquare(char piece, string pos);

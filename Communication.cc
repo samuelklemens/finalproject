@@ -69,9 +69,16 @@ void Communication::communicate()
                             {
                                 cout << game->getBoard();
                             }// end removing in setup
-                        } else if (command == "=") {
+                        } else if (command == "=") {// whos turn in setup
                             cin >> command;
-
+                            if (!game->setupTurn(command)) 
+                            {
+                                cout << "Invalid colour!" << endl;
+                            } 
+                            else 
+                            {
+                                //cout << command << " will go first." << endl;
+                            }//end whos turn
                         } else if (command == "done") {// done in setup
                                 if (game->done()) {break;}
                                 else
@@ -88,10 +95,15 @@ void Communication::communicate()
                     cout << "Cant setup during a game!" << endl;
                 }
             } else if (command == "move") {//move command
-                string startPos, endPos;
+                string startPos, endPos, promotion;
+                promotion = " ";
                 cin >> startPos;
                 cin >> endPos;
-                if (!game->move(startPos, endPos))
+                if (cin.peek() == ' ')
+                {
+                    cin >> promotion;
+                }
+                if (!game->move(startPos, endPos, promotion))
                 {
                     cout << "Invalid move!" << endl;
                 }
