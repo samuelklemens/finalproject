@@ -1,8 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 #include <iostream>
-#include <fstream>
-#include <string>
 #include "Piece.h"
 #include "Position.h"
 
@@ -10,6 +8,7 @@ class Board
 {
     Piece *squares[8][8]; //Board owns pieces, nullptr = empty square
     //this is an array of pointers, each pointing to a piece object on the heap
+    Position EnPassantTarget;
     public:
         //regular constructor
         Board();
@@ -24,6 +23,11 @@ class Board
         void setSquare(char piece, Position pos);
         Piece *getSquare(Position pos) const; //returns the piece at a given position, nullptr if nothing is there
         void movePiece(Position from, Position to); // deletes a captured piece
+
+        Position getEnPassantTarget() const; //return position of en-passant target. position where the pawn enpassant-ing will be.
+        //return position of {-1,-1} if none
+        //in pawn, canEnpassant will check if this position is diagonally 1 to the left or right of it(ie it can enpassant)
+        //This refreshes
 
         //sets up board with default pieces and positions
         /*
