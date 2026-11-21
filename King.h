@@ -10,7 +10,7 @@ class King: public Piece
 
     public: 
         //constructor and destructor
-        King(char symbol, Position pos);
+        King(char symbol, Position pos, bool moved = false);
         virtual ~King();
 
         bool isInCheck(const Board &board) const;

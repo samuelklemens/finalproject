@@ -27,14 +27,49 @@ Board::Board() : EnPassantTarget{-1,-1}
 //copy constructor
 Board::Board(const Board &other)
 {
-
     EnPassantTarget = other.EnPassantTarget;
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
+            squares[i][j] = nullptr;
+            const Piece *piece = other.squares[i][j];
+            if(piece == nullptr)
+            {
+                continue;
+            }
+            Position p{j,i};
+            switch(piece->getSymbol())
+            {
+                case 'K': case 'k': squares[i][j] = new King{piece->getSymbol(),  p, static_cast<const King*>(piece)->hasMoved()};
+                break;
+                case 'Q': case 'q': squares[i][j] = new Queen{piece->getSymbol(), p};
+                break;
+                case 'R': case 'r': squares[i][j] = new Rook{piece->getSymbol(),  p, static_cast<const Rook*>(piece)->hasMoved()};
+                break;
+                case 'N': case 'n': squares[i][j] = new Knight{piece->getSymbol(), p};
+                break;
+                case 'B': case 'b': squares[i][j] = new Bishop{piece->getSymbol(), p};
+                break;
+                case 'P': case 'p': squares[i][j] = new Pawn{piece->getSymbol(), p};
+                break;
+            }
+        }
+    }
+}
+
+//clear the board
+void Board::clear()
+{
+
+    EnPassantTarget = Position{-1, -1};
+
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
             delete squares[i][j];
-            squares[i][j] = other.squares[i][j];
+            squares[i][j] = nullptr;
         }
     }
 }
@@ -43,15 +78,16 @@ Board::Board(const Board &other)
 Board::Board(Board &&other)
 {
     EnPassantTarget = other.EnPassantTarget;
+    other.EnPassantTarget = {-1,-1};
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
-            delete squares[i][j];
             squares[i][j] = other.squares[i][j];
-            delete squares[i][j];
+            other.squares[i][j] = nullptr;
         }
     }
+    
 }
 
 //copy assignment operator
@@ -68,7 +104,28 @@ Board &Board::operator=(const Board &other)
         for(int j = 0; j < 8; j++)
         {
             delete squares[i][j];
-            squares[i][j] = other.squares[i][j];
+            squares[i][j] = nullptr;
+            const Piece *piece = other.squares[i][j];
+            if(piece == nullptr)
+            {
+                continue;
+            }
+            Position p{j,i};
+            switch(piece->getSymbol())
+            {
+                case 'K': case 'k': squares[i][j] = new King{piece->getSymbol(),  p, static_cast<const King*>(piece)->hasMoved()};
+                break;
+                case 'Q': case 'q': squares[i][j] = new Queen{piece->getSymbol(), p};
+                break;
+                case 'R': case 'r': squares[i][j] = new Rook{piece->getSymbol(),  p, static_cast<const Rook*>(piece)->hasMoved()};
+                break;
+                case 'N': case 'n': squares[i][j] = new Knight{piece->getSymbol(), p};
+                break;
+                case 'B': case 'b': squares[i][j] = new Bishop{piece->getSymbol(), p};
+                break;
+                case 'P': case 'p': squares[i][j] = new Pawn{piece->getSymbol(), p};
+                break;
+            }
         }
     }
 
@@ -83,13 +140,15 @@ Board &Board::operator=(Board &&other)
         return *this;
     }
 
+    EnPassantTarget = other.EnPassantTarget;
+    other.EnPassantTarget = {-1, -1};
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
             delete squares[i][j];
             squares[i][j] = other.squares[i][j];
-            delete squares[i][j];
+            other.squares[i][j] = nullptr;
         }
     }
 
@@ -99,13 +158,7 @@ Board &Board::operator=(Board &&other)
 //destructor
 Board::~Board()
 {
-    for(int i = 0; i < 8; i++)
-    {
-        for(int j = 0; j < 8; j++)
-        {
-            delete squares[i][j];
-        }
-    }
+    clear();
 }
 
 void Board::setSquare(char piece, Position pos)
@@ -155,6 +208,7 @@ void Board::setSquare(char piece, Position pos)
     else if(piece == ' ')
     {
         delete squares[pos.y][pos.x];
+        squares[pos.y][pos.x] = nullptr;
     }
 }
 
@@ -176,16 +230,24 @@ bool Board::isValidBoard() const
     {
         for(int j = 0; j < 8; j++)
         {
-            if(squares[i][j]->getSymbol() == 'k')
+            if(squares[i][j] != nullptr)
             {
-                blackKings++;
+                if((squares[i][j]->getSymbol() == 'P' || squares[i][j]->getSymbol() == 'p') && (i == 0 || i == 7))
+                {
+                    return false;
+                }
+                if(squares[i][j]->getSymbol() == 'k')
+                {
+                    blackKings++;
+                }
+                else if(squares[i][j]->getSymbol() == 'K')
+                {
+                    whiteKings++;
+                }
             }
-            if(squares[i][j]->getSymbol() == 'K')
-            {
-                whiteKings++;
-            }
+            
         }
     }
 
-    return blackKings == 1 && whiteKings == 1;
+    return (blackKings == 1 && whiteKings == 1);
 }
