@@ -32,7 +32,7 @@ void Communication::communicate()
                 }
                 else
                 {
-                    cout << game->getBoard(); 
+                    game->printBoard();
                 }
             } else if (command == "setup") {//setup command
                 if (!game->isRunning())
@@ -56,7 +56,7 @@ void Communication::communicate()
                                 }
                                 else
                                 {
-                                    cout << game->getBoard(); 
+                                    game->printBoard();
                                 }
                             }//end of adding in setup
                         } else if (command == "-") { // removing in setup
@@ -67,7 +67,7 @@ void Communication::communicate()
                             }
                             else
                             {
-                                cout << game->getBoard();
+                                game->printBoard();
                             }// end removing in setup
                         } else if (command == "=") {// whos turn in setup
                             cin >> command;
@@ -97,25 +97,49 @@ void Communication::communicate()
             } else if (command == "move") {//move command
                 string startPos, endPos, promotion;
                 promotion = " ";
-                cin >> startPos;
-                cin >> endPos;
-                if (cin.peek() == ' ')
+                if (cin.peek() == '\n')
                 {
-                    cin >> promotion;
-                }
-                if (!game->move(startPos, endPos, promotion))
-                {
-                    cout << "Invalid move!" << endl;
+                    if(!game->aiMove())
+                    {
+                        cout << "Invalid move!" << endl;
+                    }
+                    else
+                    {
+                        game->printBoard();
+                        if (game->getState() != "")
+                        {
+                            cout << game->getState() << endl;//prints checks statelments wins
+                        }
+                    }
                 }
                 else
                 {
-                    cout << game->getBoard(); 
+                    cin >> startPos;
+                    cin >> endPos;
+                    if (cin.peek() != '\n' && cin.peek() != EOF)//
+                    {
+                        cin >> promotion;
+                    }
+                    if (!game->move(startPos, endPos, promotion))
+                    {
+                        cout << "Invalid move!" << endl;
+                    }
+                    else
+                    {
+                        game->printBoard();
+                        if (game->getState() != "")
+                        {
+                            cout << game->getState() << endl;//prints checks statelments wins
+                        }
+                    }
                 }
             } else if (command == "resign") {//resign command
-                game->resign();
+
+                cout << game->resign() << endl;
             } else{//invalid command
                 cout << "Please enter valid command: 'game, setup, move, resign'!" << endl;
             }
         }
     }
+    game->printFinalScore();
 }
