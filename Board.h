@@ -46,6 +46,18 @@ class Board
         bool isValidBoard() const; //checks if the board is valid or not. ie: one king per side
 
         void clear();
+
+        bool isInCheck(bool whitesTurn);
+        /*
+        Depending on whos turn it is with the bool check if their king is attacked by any piece 
+        and return true if it is
+        */
+
+        bool hasLegalMoves(bool whitesTurn);
+        /*
+        Checks every piece for either white or black depending on the bool and checks if there are any
+        moves it can make that would not lead to check. Honestly good luck seems like a rough one.
+        */
 };
 
 std::ostream &operator<<(std::ostream &out, const Board &b);

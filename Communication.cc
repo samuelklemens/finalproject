@@ -32,7 +32,7 @@ void Communication::communicate()
                 }
                 else
                 {
-                    game->printBoard();
+                    cout << game->printBoard();
                 }
             } else if (command == "setup") {//setup command
                 if (!game->isRunning())
@@ -56,7 +56,7 @@ void Communication::communicate()
                                 }
                                 else
                                 {
-                                    game->printBoard();
+                                    cout << game->printBoard();
                                 }
                             }//end of adding in setup
                         } else if (command == "-") { // removing in setup
@@ -67,7 +67,7 @@ void Communication::communicate()
                             }
                             else
                             {
-                                game->printBoard();
+                                cout << game->printBoard();
                             }// end removing in setup
                         } else if (command == "=") {// whos turn in setup
                             cin >> command;
@@ -97,7 +97,8 @@ void Communication::communicate()
             } else if (command == "move") {//move command
                 string startPos, endPos, promotion;
                 promotion = " ";
-                if (cin.peek() == '\n')
+                while (cin.peek() == ' ') {cin.ignore();}
+                if (cin.peek() == '\n' || cin.peek() == EOF)
                 {
                     if(!game->aiMove())
                     {
@@ -105,7 +106,7 @@ void Communication::communicate()
                     }
                     else
                     {
-                        game->printBoard();
+                        cout << game->printBoard();
                         if (game->getState() != "")
                         {
                             cout << game->getState() << endl;//prints checks statelments wins
@@ -115,21 +116,30 @@ void Communication::communicate()
                 else
                 {
                     cin >> startPos;
-                    cin >> endPos;
-                    if (cin.peek() != '\n' && cin.peek() != EOF)//
-                    {
-                        cin >> promotion;
-                    }
-                    if (!game->move(startPos, endPos, promotion))
+                    while (cin.peek() == ' ') {cin.ignore();}
+                    if(cin.peek() == '\n' || cin.peek() == EOF) 
                     {
                         cout << "Invalid move!" << endl;
                     }
                     else
                     {
-                        game->printBoard();
-                        if (game->getState() != "")
+                        cin >> endPos;
+                        while (cin.peek() == ' ') {cin.ignore();}
+                        if (cin.peek() != '\n' && cin.peek() != EOF)//
                         {
-                            cout << game->getState() << endl;//prints checks statelments wins
+                            cin >> promotion;
+                        }
+                        if (!game->move(startPos, endPos, promotion))
+                        {
+                            cout << "Invalid move!" << endl;
+                        }
+                        else
+                        {
+                            cout << game->printBoard();
+                            if (game->getState() != "")
+                            {
+                                cout << game->getState() << endl;//prints checks statelments wins
+                            }
                         }
                     }
                 }
@@ -141,5 +151,5 @@ void Communication::communicate()
             }
         }
     }
-    game->printFinalScore();
+    cout << game->printFinalScore();
 }

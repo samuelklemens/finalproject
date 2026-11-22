@@ -4,6 +4,8 @@
 #include "Piece.h"
 #include "Score.h"
 #include "Position.h"
+#include "Human.h"
+#include "Computer.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -117,7 +119,7 @@ bool Game::move(string startPos, string endPos, string promotion)//holy code rot
     if (piece->isWhite() != whitesTurn) {return false; }//check if moving when its not their turn
     if (whitesTurn && promotion != " " && bValid.find(promotion) != string::npos) {return false; }//check if promoting wrong colour
     if (!whitesTurn && promotion != " " && wValid.find(promotion) != string::npos) {return false; }
-    std::vector<Position> validMov = piece->validMoves(*board);
+    vector<Position> validMov = piece->validMoves(*board);
     bool epInValidPos = false;
     for (Position pos : validMov)
     {
@@ -167,9 +169,9 @@ bool Game::aiMove()
     string theAiMove = curPlayer->makeMove(board);//this funciton should take board and make move based on ai level and
     //should give string in format "from to (promotion/if applicable)" eg: e2 e4, e7 e8 Q
     string startPos, endPos, promotion;
-    std::istringstream aiStream(theAiMove);
+    stringstream aiStream(theAiMove);
     aiStream >> startPos >> endPos;
-    if (!aiStream >> promotion)
+    if (!(aiStream >> promotion))
     {
         promotion = " ";
     }
@@ -254,10 +256,14 @@ string Game::getState() const
 
 string Game::printBoard() const 
 { 
-    cout << *board;
+    stringstream g;
+    g << *board;
+    return g.str();
 }
 
 string Game::printFinalScore() const 
 { 
-    cout << "Final Score:\n" << *score;
+    stringstream s;
+    s << "Final Score:\n" << *score;
+    return s.str();
 }
