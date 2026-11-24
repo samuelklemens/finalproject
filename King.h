@@ -4,6 +4,8 @@
 #include "Piece.h"
 #include <vector>
 
+class Board; 
+
 class King: public Piece
 {
     bool moved; //has moved flag used for castling
@@ -14,13 +16,14 @@ class King: public Piece
         virtual ~King();
 
         bool isInCheck(const Board &board) const;
-        bool canMove(const Board &board) const;
         bool hasMoved() const;
         bool canCastle(const Board &board, bool kingside)const;
 
         virtual void setPos(Position newPos) override; //this overide sets the moved flag to true
         
-        virtual std::vector<Position> validMoves(const Board &board) const override;
+        virtual std::vector<Position> validMoves(const Board &board) const override; 
+
+        virtual std::vector<Position> attackedSquares(const Board &board) const override;
         
 };
 

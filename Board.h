@@ -47,17 +47,22 @@ class Board
 
         void clear();
 
-        bool isInCheck(bool whitesTurn);
+        //returns true if the passed in position is attacked by an enemy piece
+        bool isSquareAttacked(Position pos, bool byWhite) const;
+
+        bool isInCheck(bool whiteKing) const;
         /*
         Depending on whos turn it is with the bool check if their king is attacked by any piece 
         and return true if it is
         */
 
-        bool hasLegalMoves(bool whitesTurn);
+        bool hasLegalMoves(bool whitesTurn) const;
         /*
         Checks every piece for either white or black depending on the bool and checks if there are any
-        moves it can make that would not lead to check. Honestly good luck seems like a rough one.
+        moves it can make that would not lead to check.
         */
+
+
 };
 
 std::ostream &operator<<(std::ostream &out, const Board &b);

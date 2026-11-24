@@ -340,3 +340,88 @@ void Board::movePiece(Position from, Position to)
     squares[from.y][from.x] = nullptr;
     p->setPos(to);
 }
+
+//returns true if the passed in position is attacked by an enemy piece
+bool Board::isSquareAttacked(Position pos, bool byWhite) const
+{
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(squares[i][j] != nullptr && squares[i][j]->isWhite() == byWhite)
+            {
+                for(Position attack : squares[i][j]->attackedSquares(*this))
+                {
+                    if(attack == pos)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    
+    return false;
+}
+
+bool Board::isInCheck(bool whiteKing) const
+{
+    char king;
+    if(whiteKing)
+    {
+        king = 'K'; 
+    }
+    else
+    {
+        king = 'k';
+    }
+
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(squares[i][j] != nullptr)
+            {
+                if(squares[i][j]->getSymbol() == king)
+                {
+                    Position p{j,i};
+                    return isSquareAttacked(p, !whiteKing);
+                }
+            }
+            
+        }
+    }
+    
+    return false;
+}
+
+bool Board::hasLegalMoves(bool whitesTurn) const
+{
+    
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(squares[i][j] != nullptr)
+            {
+                if(squares[i][j]->isWhite() == whitesTurn)
+                {
+                    vector<Position> valid = squares[i][j]->validMoves(*this);
+                    for(Position p : valid)
+                    {
+                        Board copy(*this);
+                        copy.movePiece(squares[i][j]->getPos(), p);
+                        //if the king isn't in check after checking a move. then it has at least one legal move to make
+                        if(!(copy.isInCheck(whitesTurn))) 
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    return false;
+}
