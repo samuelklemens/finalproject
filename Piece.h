@@ -30,6 +30,9 @@ class Piece
         //returns vector of all valid moves. vector knows its own size
         virtual std::vector<Position> validMoves(const Board &board) const;
 
+        //returns vector of all attacked squares of the current piece
+        virtual std::vector<Position> attackedSquares(const Board &board) const;
+
 };
 
 
