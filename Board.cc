@@ -223,7 +223,7 @@ Piece *Board::getSquare(Position pos) const
     return squares[pos.y][pos.x];
 }
 
-//checks if the board is valid or not. ie: one king per side
+//checks if the board is valid or not. ie: one king per side and no pawns in back rank
 bool Board::isValidBoard() const
 {
     int blackKings = 0, whiteKings = 0;
@@ -333,12 +333,54 @@ void Board::movePiece(Position from, Position to)
         return;
     }
 
-    EnPassantTarget = Position{-1,-1};
+    int rank = 7;
+    if(p->isWhite())
+    {
+        rank = 0;
+    }
 
+    bool isPawn = (p->getSymbol() == 'P' || p->getSymbol() == 'p');
+    bool isKing = (p->getSymbol() == 'K' || p->getSymbol() == 'k');
+    
+    //if enpassant, need to delete the piece beside the pawn that is executing the enpassant
+    if(isPawn && getSquare(to) == nullptr && (from.x - to.x != 0) && to == EnPassantTarget)
+    {
+        delete squares[from.y][to.x];
+        squares[from.y][to.x] = nullptr;
+    }
+    else if (isKing && (from.x - to.x == 2 || from.x - to.x == -2)) //if castled
+    {
+        if(to.x == 6 && squares[rank][7] != nullptr)//kingside castle, move kingside rook
+        {
+            squares[rank][5] = squares[rank][7];
+            squares[rank][7] = nullptr;
+            squares[rank][5]->setPos(Position{5, rank});
+        }
+        else if(to.x == 2 && squares[rank][0] != nullptr) //queenside castle, move queenside rook
+        {
+            squares[rank][3] = getSquare(Position{0, rank});
+            squares[rank][0] = nullptr;
+            squares[rank][3]->setPos(Position{3, rank});
+        }
+    }
+
+    //make the move
     delete squares[to.y][to.x];
     squares[to.y][to.x] = p;
     squares[from.y][from.x] = nullptr;
     p->setPos(to);
+    
+    
+    //if two square pawn move, then update enpassant target
+    if(isPawn && ((from.y - to.y) == 2 || from.y - to.y == -2) )
+    {
+        EnPassantTarget = Position{from.x, (from.y + to.y) / 2};
+    }
+    else
+    {
+        EnPassantTarget = Position{-1,-1};
+    }
+    
 }
 
 //returns true if the passed in position is attacked by an enemy piece
