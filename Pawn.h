@@ -13,8 +13,10 @@ class Pawn: public Piece
 
         bool isFirstMove() const;
         bool canPromote() const;
-        bool canEnpassant(const Board &board) const;
+        bool canEnpassant(const Board &board, bool rightSide) const;
         
+        virtual std::vector<Position> attackedSquares(const Board &board) const override;
+
         virtual std::vector<Position> validMoves(const Board &board) const override;
         
 };
