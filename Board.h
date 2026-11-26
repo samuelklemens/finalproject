@@ -62,7 +62,9 @@ class Board
         moves it can make that would not lead to check.
         */
 
-
+        bool isLegalMove(Position from, Position to, bool whitesTurn) const;
+        //returns true if the move is legal(doesn't leave the player's own king in check)
+        //assumes that to is in the piece's valid move set
 };
 
 std::ostream &operator<<(std::ostream &out, const Board &b);

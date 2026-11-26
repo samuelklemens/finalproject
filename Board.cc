@@ -223,7 +223,7 @@ Piece *Board::getSquare(Position pos) const
     return squares[pos.y][pos.x];
 }
 
-//checks if the board is valid or not. ie: one king per side and no pawns in back rank
+//checks if the board is valid or not. ie: one king per side and no pawns in back rank, and neither king is in check
 bool Board::isValidBoard() const
 {
     int blackKings = 0, whiteKings = 0;
@@ -250,7 +250,13 @@ bool Board::isValidBoard() const
         }
     }
 
-    return (blackKings == 1 && whiteKings == 1);
+    if(blackKings != 1 || whiteKings != 1)
+    {
+        return false;
+    }
+    
+    //once we know that theres only one king per side, check that those kings aren't in check
+    return !isInCheck(true) && !isInCheck(false);
 }
 
 Position Board::getEnPassantTarget() const
@@ -259,16 +265,6 @@ Position Board::getEnPassantTarget() const
 }
 
 //sets up board with default pieces and positions
-/*
-8 rnbqkbnr
-7 pppppppp
-6  _ _ _ _
-5 _ _ _ _
-4  _ _ _ _
-3 _ _ _ _
-2 PPPPPPPP
-1 RNBQKBNR 
-  abcdefgh */
 void Board::defaultSetup()
 {
     clear();
@@ -313,11 +309,13 @@ std::ostream &operator<<(std::ostream &out, const Board &b)
     return out;
 }
 
+//prints the board using overloaded output operator
 void Board::printBoard() const
 {
     cout << *this;
 }
 
+//executes move, is pseudo legal
 void Board::movePiece(Position from, Position to)
 {
 
@@ -437,6 +435,27 @@ bool Board::isInCheck(bool whiteKing) const
     return false;
 }
 
+//checks that a move doesn't leave one's own king in check
+bool Board::isLegalMove(Position from, Position to, bool whitesTurn) const
+{
+    if(getSquare(from) == nullptr || !to.validPos() )//no piece to move or position isn't valid
+    {
+        return false;
+    }
+
+    if(getSquare(from)->isWhite() == whitesTurn)
+    {
+        Board copy(*this);
+        copy.movePiece(from, to);
+        //if the king isn't in check after checking a move, then its legal
+        if(!(copy.isInCheck(whitesTurn))) 
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Board::hasLegalMoves(bool whitesTurn) const
 {
     
@@ -451,10 +470,7 @@ bool Board::hasLegalMoves(bool whitesTurn) const
                     vector<Position> valid = squares[i][j]->validMoves(*this);
                     for(Position p : valid)
                     {
-                        Board copy(*this);
-                        copy.movePiece(squares[i][j]->getPos(), p);
-                        //if the king isn't in check after checking a move. then it has at least one legal move to make
-                        if(!(copy.isInCheck(whitesTurn))) 
+                        if(isLegalMove(squares[i][j]->getPos(), p, whitesTurn))
                         {
                             return true;
                         }
