@@ -29,6 +29,6 @@ void Score::changeBlackScore(double num)
 
 std::ostream &operator<<(std::ostream &out, const Score &s)
 {
-    out << "White: " << s.getWhiteScore() << "\n" << "Black :" << s.getBlackScore() << endl;
+    out << "White: " << s.getWhiteScore() << "\n" << "Black: " << s.getBlackScore() << endl;//fix here 1
     return out;
 }

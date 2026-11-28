@@ -37,43 +37,49 @@ bool Game::newGame(string white, string black)
     When game white-player black-player is called it has to delete the players as the player could be 
     changed to an ai or human but the score should be kept the same 
     */
-    if (whitePlayer != nullptr && blackPlayer != nullptr)
-    {
-        delete whitePlayer;
-        delete blackPlayer;
-    }
+    
     //set up white player yeah i know i could do this better but it works for now
+    Player *newWhitePlayer = nullptr;
+    Player *newBlackPlayer = nullptr;
     if (white == "human") {
-        whitePlayer = new Human{"white"};//im assuming players are: string colour, int level if ai
+        newWhitePlayer = new Human{"white"};//im assuming players are: string colour, int level if ai
     } else if (white == "computer1") {
-        whitePlayer = new Computer{"white", 1};
+        newWhitePlayer = new Computer{"white", 1};
     } else if (white == "computer2") {
-        whitePlayer = new Computer{"white", 2};
+        newWhitePlayer = new Computer{"white", 2};
     } else if (white == "computer3") {
-        whitePlayer = new Computer{"white", 3};
+        newWhitePlayer = new Computer{"white", 3};
     } else if (white == "computer4") {
-        whitePlayer = new Computer{"white", 4};
+        newWhitePlayer = new Computer{"white", 4};
     } else {
         return false;
     }
     //set up black
     if (black == "human") {
-        blackPlayer = new Human{"black"};
+        newBlackPlayer = new Human{"black"};
     } else if (black == "computer1") {
-        blackPlayer = new Computer{"black", 1};
+        newBlackPlayer = new Computer{"black", 1};
     } else if (black == "computer2") {
-        blackPlayer = new Computer{"black", 2};
+        newBlackPlayer = new Computer{"black", 2};
     } else if (black == "computer3") {
-        blackPlayer = new Computer{"black", 3};
+        newBlackPlayer = new Computer{"black", 3};
     } else if (black == "computer4") {
-        blackPlayer = new Computer{"black", 4};
+        newBlackPlayer = new Computer{"black", 4};
     } else {
-        delete whitePlayer; // new game failed cant leave it here
-        whitePlayer = nullptr;
+        delete newWhitePlayer; // new game failed cant leave it here
+        newWhitePlayer = nullptr;
         return false;
+    }
+    if (newWhitePlayer != nullptr && newBlackPlayer != nullptr)
+    {
+        delete whitePlayer;
+        delete blackPlayer;
+        whitePlayer = newWhitePlayer;
+        blackPlayer = newBlackPlayer;
     }
     if (!isSetup)
     {
+        whitesTurn = true;//fix here 3
         board->defaultSetup();//make sure i dont reset board its setup
     }
     else
@@ -91,6 +97,7 @@ Board &Game::getBoard()
 
 void Game::setup()
 {
+    whitesTurn = true;//fix here 2
     isSetup = true;
     board->clear();
 }
@@ -128,13 +135,14 @@ bool Game::move(string startPos, string endPos, string promotion)//holy code rot
     if (epInValidPos == false) {return false; }
     if (piece->getSymbol() == 'P' && whitesTurn && ep.y == 7 && promotion == " ") {return false; }//check if you dont promote when moving pawn to end
     if (piece->getSymbol() == 'p' && !whitesTurn && ep.y == 0 && promotion == " ") {return false; }
+    if (!board->isLegalMove(sp, ep, whitesTurn)) {return false; }// check if move puts king in check
     //now the move must be valid
     board->movePiece(sp, ep);
     if (promotion != " ") 
     {
         board->setSquare(promotion[0], ep);
     }
-    whitesTurn = !whitesTurn;
+    whitesTurn = !whitesTurn;//change turn
     //set game state after a move
     bool check = board->isInCheck(whitesTurn);//returns a bool whether black or white is in check
     bool noLegal = !board->hasLegalMoves(whitesTurn);//retuns a bool wheter black or white has any legal moves
@@ -252,6 +260,22 @@ bool Game::done()
 string Game::getState() const
 {
     return gameState;
+}
+
+string Game::getTurn() const
+{
+    if (running == false)//just in case newGame fails
+    {
+        return "";
+    }
+    if (whitesTurn)
+    {
+        return "White's turn!";
+    }
+    else
+    {
+        return "Black's turn!";
+    }
 }
 
 string Game::printBoard() const 

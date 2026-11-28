@@ -33,6 +33,7 @@ void Communication::communicate()
                 else
                 {
                     cout << game->printBoard();
+                    cout << game->getTurn() << endl;
                 }
             } else if (command == "setup") {//setup command
                 if (!game->isRunning())
@@ -107,6 +108,7 @@ void Communication::communicate()
                     else
                     {
                         cout << game->printBoard();
+                        cout << game->getTurn() << endl;
                         if (game->getState() != "")
                         {
                             cout << game->getState() << endl;//prints checks statelments wins
@@ -136,6 +138,7 @@ void Communication::communicate()
                         else
                         {
                             cout << game->printBoard();
+                            cout << game->getTurn() << endl;
                             if (game->getState() != "")
                             {
                                 cout << game->getState() << endl;//prints checks statelments wins

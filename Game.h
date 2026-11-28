@@ -32,6 +32,7 @@ class Game
         bool setupTurn(std::string colour);
         bool done();
         std::string getState() const;//its private to game so i need this to print
+        std::string getTurn() const;
         std::string printBoard() const;
         std::string printFinalScore() const;
 };
